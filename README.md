@@ -45,8 +45,6 @@ La aplicación valida `PORT`, `MONGODB_URI` y `NODE_ENV` al arrancar. Si falta c
 ```text
 src/
 ├── config/
-│   └── env.config.js
-├── constants/
 │   └── index.js
 ├── controllers/
 │   ├── product.controller.js
@@ -63,8 +61,10 @@ src/
 ├── services/
 │   ├── product.service.js
 │   └── user.service.js
-├── utils/
-│   └── errors.js
+└── utils/
+│    ├── constants.js
+│    └── errors.js
+│
 └── server.js
 ```
 
