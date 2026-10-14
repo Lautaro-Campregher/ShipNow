@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import usersRouter from "./routes/users.js";
-import productsRouter from "./routes/products.js";
+import ordersRouter from "./routes/orders.js";
+import deliveriesRouter from "./routes/deliveries.js";
+import mocksRouter from "./routes/mocks.router.js";
 import { config } from "./config/index.js";
 
 const app = express();
@@ -12,7 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", usersRouter);
-app.use("/api/products", productsRouter);
+app.use("/api/orders", ordersRouter);
+app.use("/api/deliveries", deliveriesRouter);
+app.use("/api/mocks", mocksRouter);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({

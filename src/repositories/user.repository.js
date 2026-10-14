@@ -1,4 +1,4 @@
-import User from '../models/user.model.js';
+import User from "../models/user.model.js";
 
 class UserRepository {
   async findAll() {
@@ -20,11 +20,15 @@ class UserRepository {
     return userObject;
   }
 
+  async createMany(users) {
+    return User.insertMany(users);
+  }
+
   async updateById(id, updatedUser) {
     return User.findByIdAndUpdate(id, updatedUser, {
       new: true,
       runValidators: true,
-      projection: { password: 0 }
+      projection: { password: 0 },
     }).lean();
   }
 

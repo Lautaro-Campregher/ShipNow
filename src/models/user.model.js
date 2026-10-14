@@ -3,12 +3,12 @@ import { USER_ROLES } from "../utils/constants.js";
 
 const userSchema = new mongoose.Schema(
   {
-    first_name: {
+    firstName: {
       type: String,
       required: [true, "El nombre es obligatorio"],
       trim: true,
     },
-    last_name: {
+    lastName: {
       type: String,
       required: [true, "El apellido es obligatorio"],
       trim: true,
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
-      default: USER_ROLES.USER,
+      default: USER_ROLES.CUSTOMER,
     },
     documents: {
       type: [
