@@ -14,7 +14,7 @@ class UserService {
     const user = await this.repository.findById(id);
 
     if (!user) {
-      throw new AppError("Usuario no encontrado", 404);
+      throw AppError.fromCode("USER_NOT_FOUND");
     }
 
     return user;
@@ -22,13 +22,13 @@ class UserService {
 
   async create(userData) {
     if (userData.role === USER_ROLES.ADMIN) {
-      throw new AppError("No es posible crear admins desde este endpoint", 400);
+      throw AppError.fromCode("USER_ADMIN_CREATION_FORBIDDEN");
     }
 
     const existingUser = await this.repository.findByEmail(userData.email);
 
     if (existingUser) {
-      throw new AppError("Este email ya se encuentra registrado", 409);
+      throw AppError.fromCode("USER_EMAIL_ALREADY_EXISTS");
     }
 
     return this.repository.create({
@@ -39,16 +39,13 @@ class UserService {
 
   async update(id, userData) {
     if (userData.role === USER_ROLES.ADMIN) {
-      throw new AppError(
-        "No es posible asignar el rol admin desde este endpoint",
-        400,
-      );
+      throw AppError.fromCode("USER_ADMIN_ROLE_ASSIGNMENT_FORBIDDEN");
     }
 
     const updatedUser = await this.repository.updateById(id, userData);
 
     if (!updatedUser) {
-      throw new AppError("Usuario no encontrado", 404);
+      throw AppError.fromCode("USER_NOT_FOUND");
     }
 
     return updatedUser;
@@ -58,7 +55,7 @@ class UserService {
     const deletedUser = await this.repository.deleteById(id);
 
     if (!deletedUser) {
-      throw new AppError("Usuario no encontrado", 404);
+      throw AppError.fromCode("USER_NOT_FOUND");
     }
 
     return deletedUser;

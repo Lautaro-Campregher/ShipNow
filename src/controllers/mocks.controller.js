@@ -1,16 +1,39 @@
 import mocksService from "../services/mocks.service.js";
 import seedService from "../services/seed.service.js";
+import AppError from "../utils/errors.js";
 
 class MocksController {
-  async handleGeneration(req, res, generator) {
+  getUsers = (req, res, next) =>
+    this.handleGeneration(req, res, next, (qty) =>
+      mocksService.generateUsers(qty),
+    );
+
+  getDrivers = (req, res, next) =>
+    this.handleGeneration(req, res, next, (qty) =>
+      mocksService.generateDrivers(qty),
+    );
+
+  getOrders = (req, res, next) =>
+    this.handleGeneration(req, res, next, (qty) =>
+      mocksService.generateOrders(qty),
+    );
+
+  getDeliveries = (req, res, next) =>
+    this.handleGeneration(req, res, next, (qty) =>
+      mocksService.generateDeliveries(qty),
+    );
+
+  getDataset = (req, res, next) =>
+    this.handleGeneration(req, res, next, (qty) =>
+      mocksService.generateRelatedData(qty),
+    );
+
+  handleGeneration = async (req, res, next, generator) => {
     try {
       const qty = Number(req.query.qty ?? 2);
 
       if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
-        return res.status(400).json({
-          status: "error",
-          message: "El parámetro qty debe ser un entero entre 1 y 100",
-        });
+        throw AppError.fromCode("INVALID_MOCK_QUANTITY");
       }
 
       const payload = await generator(qty);
@@ -20,46 +43,16 @@ class MocksController {
         payload,
       });
     } catch (error) {
-      return res.status(500).json({
-        status: "error",
-        message: "Error al generar datos ficticios",
-      });
+      return next(error);
     }
-  }
+  };
 
-  getUsers(req, res) {
-    return this.handleGeneration(req, res, (qty) =>
-      mocksService.generateUsers(qty),
-    );
-  }
-
-  getDrivers(req, res) {
-    return this.handleGeneration(req, res, (qty) =>
-      mocksService.generateDrivers(qty),
-    );
-  }
-
-  getOrders(req, res) {
-    return this.handleGeneration(req, res, (qty) =>
-      mocksService.generateOrders(qty),
-    );
-  }
-
-  getDeliveries(req, res) {
-    return this.handleGeneration(req, res, (qty) =>
-      mocksService.generateDeliveries(qty),
-    );
-  }
-
-  async generateSeed(req, res) {
+  generateSeed = async (req, res, next) => {
     try {
       const qty = Number(req.query.qty ?? 10);
 
       if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
-        return res.status(400).json({
-          status: "error",
-          message: "El parámetro qty debe ser un entero entre 1 y 100",
-        });
+        throw AppError.fromCode("INVALID_MOCK_QUANTITY");
       }
 
       const payload = await seedService.generateSeed(qty);
@@ -69,20 +62,9 @@ class MocksController {
         payload,
       });
     } catch (error) {
-      console.error("Error al ejecutar el seed:", error.message);
-
-      return res.status(500).json({
-        status: "error",
-        message: "No fue posible insertar los datos de prueba",
-      });
+      return next(error);
     }
-  }
-
-  async getDataset(req, res) {
-    return this.handleGeneration(req, res, (qty) =>
-      mocksService.generateRelatedData(qty),
-    );
-  }
+  };
 }
 
 export default new MocksController();

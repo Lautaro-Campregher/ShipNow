@@ -12,7 +12,7 @@ class OrdersService {
     const order = await orderRepository.findById(id);
 
     if (!order) {
-      throw new AppError("Pedido no encontrado", 404);
+      throw AppError.fromCode("ORDER_NOT_FOUND");
     }
 
     return order;
@@ -22,11 +22,11 @@ class OrdersService {
     const customer = await userRepository.findById(orderData.customer);
 
     if (!customer) {
-      throw new AppError("El cliente especificado no existe", 400);
+      throw AppError.fromCode("ORDER_CUSTOMER_NOT_FOUND");
     }
 
     if (!Array.isArray(orderData.items) || orderData.items.length === 0) {
-      throw new AppError("El pedido debe tener al menos un item", 400);
+      throw AppError.fromCode("ORDER_ITEMS_REQUIRED");
     }
 
     const itemsTotal = orderData.items.reduce(
@@ -51,7 +51,7 @@ class OrdersService {
     const updatedOrder = await orderRepository.update(id, orderData);
 
     if (!updatedOrder) {
-      throw new AppError("Pedido no encontrado", 404);
+      throw AppError.fromCode("ORDER_NOT_FOUND");
     }
 
     return updatedOrder;
@@ -61,7 +61,7 @@ class OrdersService {
     const deletedOrder = await orderRepository.delete(id);
 
     if (!deletedOrder) {
-      throw new AppError("Pedido no encontrado", 404);
+      throw AppError.fromCode("ORDER_NOT_FOUND");
     }
 
     return deletedOrder;

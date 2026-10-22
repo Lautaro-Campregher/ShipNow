@@ -1,70 +1,54 @@
-import userService from "../services/user.service.js";
+import UserService from "../services/user.service.js";
 import userRepository from "../repositories/user.repository.js";
-import userMockRepository from "../repositories/user.mock.repository.js";
 
-const servicio_productivo = new userService(userRepository);
-const servicio_mock = new userService(userMockRepository);
+const userService = new UserService(userRepository);
 
 class UserController {
-  constructor(userService) {
-    this.userService = userService;
-  }
-
-  async findAll(req, res) {
+  async findAll(req, res, next) {
     try {
-      const users = await this.userService.findAll();
+      const users = await userService.findAll();
       return res.status(200).json({ status: "success", payload: users });
     } catch (error) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ status: "error", message: error.message });
+      next(error);
     }
   }
 
-  async findById(req, res) {
+  async findById(req, res, next) {
     try {
-      const user = await this.userService.findById(req.params.id);
+      const user = await userService.findById(req.params.id);
       return res.status(200).json({ status: "success", payload: user });
     } catch (error) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ status: "error", message: error.message });
+      next(error);
     }
   }
 
-  async create(req, res) {
+  async create(req, res, next) {
     try {
-      const user = await this.userService.create(req.body);
+      const user = await userService.create(req.body);
       return res.status(201).json({ status: "success", payload: user });
     } catch (error) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ status: "error", message: error.message });
+      next(error);
     }
   }
 
-  async update(req, res) {
+  async update(req, res, next) {
     try {
-      const updatedUser = await this.userService.update(
-        req.params.id,
-        req.body,
-      );
+      const updatedUser = await userService.update(req.params.id, req.body);
       return res.status(200).json({ status: "success", payload: updatedUser });
     } catch (error) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ status: "error", message: error.message });
+      next(error);
     }
   }
 
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
-      const deletedUser = await this.userService.delete(req.params.id);
-      return res.status(200).json({ status: "success", payload: deletedUser });
+      await userService.delete(req.params.id);
+      return res.status(200).json({
+        status: "success",
+        message: "Usuario eliminado",
+      });
     } catch (error) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ status: "error", message: error.message });
+      next(error);
     }
   }
 }

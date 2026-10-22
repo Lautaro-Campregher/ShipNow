@@ -67,6 +67,8 @@ Routes → Controller → Service → Repository → Model/MongoDB
 
 El módulo de mocking utiliza servicios para generar datos simulados sin persistirlos. El módulo de seed coordina los repositorios para insertar usuarios, pedidos y entregas manteniendo sus relaciones.
 
+Los errores que se producen durante el procesamiento se propagan hacia el middleware centralizado de manejo de errores.
+
 ## Estructura del proyecto
 
 ```text
@@ -79,6 +81,9 @@ ShipNow/
 │   │   ├── mocks.controller.js
 │   │   ├── orders.controller.js
 │   │   └── user.controller.js
+│   ├── middlewares/
+│   │   ├── errorHandler.js
+│   │   └── routeNotFoundHandler.js
 │   ├── models/
 │   │   ├── delivery.model.js
 │   │   ├── order.model.js
@@ -166,6 +171,83 @@ La URL base de desarrollo es `http://localhost:8080`.
 | DELETE | `/api/deliveries/:id` | Eliminar una entrega   |
 
 Las operaciones de creación y actualización deben respetar los campos definidos por los modelos y las relaciones entre las entidades.
+
+# Manejo profesional de errores
+
+La API implementa un sistema centralizado de manejo de errores para mantener respuestas consistentes y separar la lógica de negocio del tratamiento de los errores HTTP.
+
+## Componentes principales
+
+`src/utils/errors.js`: define ErrorDictionary, que centraliza los códigos, mensajes y estados HTTP de los errores. También implementa AppError, una clase personalizada para representar errores controlados.
+
+`src/middlewares/routeNotFoundHandler.js`: gestiona las solicitudes a rutas inexistentes.
+
+`src/middlewares/errorHandler.js`: interpreta los errores recibidos, determina su clasificación y devuelve una respuesta HTTP uniforme.
+
+Los controladores delegan el tratamiento de los errores al middleware mediante next(error), evitando duplicar la construcción de respuestas de error en cada endpoint.
+
+Formato de las respuestas de error
+
+Las respuestas siguen una estructura JSON uniforme:
+
+```json
+{
+  "status": "error",
+  "message": "Mensaje descriptivo del error",
+  "code": "ERROR_CODE"
+}
+```
+
+Cada error incluye:
+
+status: indica que la operación falló.
+
+message: describe el problema.
+
+code: identifica el tipo de error mediante un código estable.
+
+### Códigos de error
+
+La API utiliza códigos específicos para identificar los errores y facilitar su interpretación por parte del cliente.
+
+| Código                                 | Estado HTTP | Descripción                                                |
+| -------------------------------------- | ----------: | ---------------------------------------------------------- |
+| `USER_NOT_FOUND`                       |         404 | Usuario inexistente.                                       |
+| `ORDER_NOT_FOUND`                      |         404 | Pedido inexistente.                                        |
+| `DELIVERY_NOT_FOUND`                   |         404 | Entrega inexistente.                                       |
+| `DELIVERY_ORDER_NOT_FOUND`             |         400 | Pedido asociado a la entrega inválido o inexistente.       |
+| `DELIVERY_DRIVER_INVALID`              |         400 | Repartidor inválido.                                       |
+| `ROUTE_NOT_FOUND`                      |         404 | Ruta inexistente.                                          |
+| `VALIDATION_ERROR`                     |         400 | Error de validación de datos.                              |
+| `INVALID_JSON`                         |         400 | El cuerpo de la solicitud contiene JSON mal formado.       |
+| `INVALID_ID`                           |         400 | Identificador inválido.                                    |
+| `INVALID_MOCK_QUANTITY`                |         400 | La cantidad solicitada para los mocks no es válida.        |
+| `RESOURCE_CONFLICT`                    |         409 | Conflicto con un recurso existente.                        |
+| `DATABASE_ERROR`                       |         500 | Error al acceder a la base de datos.                       |
+| `INTERNAL_SERVER_ERROR`                |         500 | Error interno no clasificado.                              |
+| `ORDER_CUSTOMER_NOT_FOUND`             |         400 | Cliente asociado al pedido inexistente.                    |
+| `ORDER_ITEMS_REQUIRED`                 |         400 | El pedido debe contener artículos.                         |
+| `USER_ADMIN_CREATION_FORBIDDEN`        |         400 | No está permitida la creación de usuarios administradores. |
+| `USER_ADMIN_ROLE_ASSIGNMENT_FORBIDDEN` |         400 | No está permitida la asignación del rol administrador.     |
+| `USER_EMAIL_ALREADY_EXISTS`            |         409 | El correo electrónico ya está registrado.                  |
+
+### Clasificación de errores
+
+El middleware central reconoce diferentes tipos de errores y los transforma en respuestas controladas:
+
+Errores de identificadores: los errores de tipo CastError se convierten en INVALID_ID.
+
+Errores de formato JSON: las solicitudes con JSON mal formado se convierten en INVALID_JSON.
+
+Errores de validación de Mongoose: se clasifican como VALIDATION_ERROR.
+
+Errores de conexión o acceso a MongoDB: los errores de conexión, selección de servidor y red se clasifican como DATABASE_ERROR.
+
+Errores de negocio: utilizan los códigos definidos en ErrorDictionary.
+
+Errores no reconocidos: se devuelven como INTERNAL_SERVER_ERROR.
+
+Este enfoque permite que el cliente reciba mensajes y códigos consistentes, sin exponer detalles internos de la implementación.
 
 ## Mocking y datos de prueba
 

@@ -17,7 +17,7 @@ class DeliveriesService {
     const delivery = await deliveryRepository.findById(id);
 
     if (!delivery) {
-      throw new AppError("Entrega no encontrada", 404);
+      throw AppError.fromCode("DELIVERY_NOT_FOUND");
     }
 
     return delivery;
@@ -27,17 +27,14 @@ class DeliveriesService {
     const order = await orderRepository.findById(deliveryData.order);
 
     if (!order) {
-      throw new AppError("El pedido especificado no existe", 400);
+      throw AppError.fromCode("ORDER_NOT_FOUND");
     }
 
     if (deliveryData.driver) {
       const driver = await userRepository.findById(deliveryData.driver);
 
       if (!driver || driver.role !== USER_ROLES.DRIVER) {
-        throw new AppError(
-          "El repartidor especificado no existe o no tiene el rol correcto",
-          400,
-        );
+        throw AppError.fromCode("DELIVERY_DRIVER_INVALID");
       }
     }
 
@@ -57,7 +54,7 @@ class DeliveriesService {
       const order = await orderRepository.findById(deliveryData.order);
 
       if (!order) {
-        throw new AppError("El pedido especificado no existe", 400);
+        throw AppError.fromCode("DELIVERY_ORDER_NOT_FOUND");
       }
     }
 
@@ -65,17 +62,14 @@ class DeliveriesService {
       const driver = await userRepository.findById(deliveryData.driver);
 
       if (!driver || driver.role !== USER_ROLES.DRIVER) {
-        throw new AppError(
-          "El repartidor especificado no existe o no tiene el rol correcto",
-          400,
-        );
+        throw AppError.fromCode("DELIVERY_DRIVER_INVALID");
       }
     }
 
     const updatedDelivery = await deliveryRepository.update(id, deliveryData);
 
     if (!updatedDelivery) {
-      throw new AppError("Entrega no encontrada", 404);
+      throw AppError.fromCode("DELIVERY_NOT_FOUND");
     }
 
     return updatedDelivery;
@@ -85,7 +79,7 @@ class DeliveriesService {
     const deletedDelivery = await deliveryRepository.delete(id);
 
     if (!deletedDelivery) {
-      throw new AppError("Entrega no encontrada", 404);
+      throw AppError.fromCode("DELIVERY_NOT_FOUND");
     }
 
     return deletedDelivery;
