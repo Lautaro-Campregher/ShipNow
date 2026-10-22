@@ -109,6 +109,7 @@ ShipNow/
 │   │   ├── errors.js
 │   │
 │   └── server.js
+│   └── app.js
 ├── .env.example
 ├── .gitignore
 ├── package.json
