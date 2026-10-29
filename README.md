@@ -107,6 +107,7 @@ ShipNow/
 │   ├── utils/
 │   │   ├── constants.js
 │   │   ├── errors.js
+│   │   └── user.service.js
 │   │
 │   └── server.js
 │   └── app.js
@@ -312,6 +313,26 @@ La cantidad de usuarios incluye los clientes y repartidores creados. En este eje
 
 **Importante:** cada ejecución del seed inserta nuevos registros. Ejecutarlo varias veces puede aumentar la cantidad de documentos almacenados en MongoDB.
 
+#### Ejemplo de cantidad inválida
+
+**Solicitud:**
+
+`GET /api/mocks/users?qty=0`
+
+Si la cantidad solicitada no es un entero entre 1 y 100, la API responde con un error `INVALID_MOCK_QUANTITY`.
+
+**Respuesta esperada:**
+
+```json
+{
+  "status": "error",
+  "message": "La cantidad solicitada para los mocks no es válida",
+  "code": "INVALID_MOCK_QUANTITY"
+}
+```
+
+El mismo criterio de validación se aplica al endpoint `POST /api/mocks/seed`, que utiliza `qty=10` como valor predeterminado cuando no se especifica el parámetro.
+
 ## Estados, prioridades y relaciones
 
 Los datos generados respetan los modelos y las constantes del proyecto:
@@ -323,6 +344,67 @@ Los datos generados respetan los modelos y las constantes del proyecto:
 - Las entregas referencian a sus pedidos y, cuando están asignadas, a un repartidor con el rol correspondiente.
 
 Las operaciones de mocking no persisten información. La persistencia se realiza únicamente mediante el endpoint de seed o las operaciones CRUD correspondientes.
+
+## Logging y monitoreo
+
+ShipNow utiliza **Winston** para centralizar los registros de eventos y errores de la aplicación. La configuración se encuentra en `src/utils/logger.js`.
+
+### Niveles de logging
+
+El logger utiliza seis niveles personalizados, ordenados de mayor a menor prioridad:
+
+- `fatal`: errores críticos que impiden el funcionamiento normal de la aplicación.
+- `error`: errores de ejecución.
+- `warning`: situaciones anómalas o solicitudes inválidas.
+- `info`: eventos importantes, como el inicio del servidor, la conexión a MongoDB, la generación de mocks y la creación de pedidos.
+- `http`: eventos relacionados con solicitudes HTTP.
+- `debug`: información detallada útil durante el desarrollo.
+
+Cada registro incluye fecha, hora, nivel y mensaje.
+
+### Configuración por entorno
+
+El comportamiento se determina mediante la variable `NODE_ENV`:
+
+- **Desarrollo (`development`):** muestra todos los niveles, desde `debug` hasta `fatal`.
+- **Producción (`production`):** muestra desde `info` hasta `fatal`, omitiendo `http` y `debug` en consola.
+
+### Persistencia y rotación
+
+Los registros `error` y `fatal` se almacenan en la carpeta `logs/`, mediante archivos con nombres basados en la fecha, por ejemplo, `error-2026-10-28.log`.
+
+La rotación está configurada con Winston Daily Rotate File:
+
+- Tamaño máximo por archivo: `5 MB`.
+- Retención: `14 días`.
+- Rotación por fecha.
+- Los registros de menor severidad no se persisten en estos archivos.
+
+La carpeta `logs/` está excluida del repositorio mediante `.gitignore`.
+
+### Endpoint de prueba
+
+En desarrollo se puede probar el logger mediante:
+
+`GET /api/mocks/logger-test`
+
+El endpoint emite un registro por cada uno de los seis niveles. Las rutas de mocks no están disponibles en producción.
+
+### Archivos excluidos de Git
+
+El archivo `.gitignore` excluye:
+
+- `node_modules/`: dependencias instaladas.
+- `.env`: variables de entorno y configuración local.
+- `logs/`: archivos de registro generados durante la ejecución.
+
+### Ubicación de los archivos de log
+
+Los archivos de registro se almacenan en la carpeta `logs/`, ubicada en la **raíz del proyecto**, al mismo nivel que `src/`, `node_modules/` y `package.json`.
+
+Esta carpeta se genera o utiliza durante la ejecución de la aplicación y contiene los archivos de log rotativos, por ejemplo, `error-2026-10-28.log`.
+
+La carpeta `logs/` está incluida en `.gitignore`, por lo que los registros generados localmente no se suben al repositorio de GitHub.
 
 ## Scripts disponibles
 

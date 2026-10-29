@@ -6,13 +6,21 @@ import {
   DELIVERY_STATUS,
   DELIVERY_PRIORITY,
 } from "../utils/constants.js";
-
+import AppError from "../utils/errors.js";
+import logger from "../utils/logger.js";
 import userRepository from "../repositories/user.repository.js";
 import orderRepository from "../repositories/order.repository.js";
 import deliveryRepository from "../repositories/delivery.repository.js";
 
 class SeedService {
+  validateQuantity(qty) {
+    if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+      logger.warning(`Cantidad de mocks inválida recibida: ${qty}`);
+      throw AppError.fromCode("INVALID_MOCK_QUANTITY");
+    }
+  }
   async generateSeed(qty = 10) {
+    this.validateQuantity(qty);
     const driverQty = Math.max(1, Math.ceil(qty / 2));
 
     const usersToCreate = Array.from(
@@ -87,7 +95,7 @@ class SeedService {
       ),
     );
 
-    return {
+    const result = {
       insertados: {
         usuarios: insertedUsers.length,
         clientes: customers.length,
@@ -96,6 +104,12 @@ class SeedService {
         entregas: insertedDeliveries.length,
       },
     };
+
+    logger.info(
+      `Seed generado correctamente. ${JSON.stringify(result.insertados)}`,
+    );
+
+    return result;
   }
 }
 

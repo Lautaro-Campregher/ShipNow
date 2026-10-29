@@ -2,6 +2,7 @@ import orderRepository from "../repositories/order.repository.js";
 import userRepository from "../repositories/user.repository.js";
 import AppError from "../utils/errors.js";
 import { ORDER_STATUS, ORDER_PRIORITY } from "../utils/constants.js";
+import logger from "../utils/logger.js";
 
 class OrdersService {
   async findAll(filter = {}) {
@@ -12,6 +13,7 @@ class OrdersService {
     const order = await orderRepository.findById(id);
 
     if (!order) {
+      logger.warning(`Pedido no encontrado. ID: ${id}`);
       throw AppError.fromCode("ORDER_NOT_FOUND");
     }
 
@@ -37,7 +39,7 @@ class OrdersService {
     const shippingCost = orderData.shippingCost ?? 0;
     const declaredValue = orderData.declaredValue ?? itemsTotal;
 
-    return orderRepository.create({
+    const order = await orderRepository.create({
       ...orderData,
       declaredValue,
       shippingCost,
@@ -45,6 +47,10 @@ class OrdersService {
       status: ORDER_STATUS.CREATED,
       priority: orderData.priority ?? ORDER_PRIORITY.NORMAL,
     });
+
+    logger.info(`Pedido creado correctamente. ID: ${order._id}`);
+
+    return order;
   }
 
   async update(id, orderData) {

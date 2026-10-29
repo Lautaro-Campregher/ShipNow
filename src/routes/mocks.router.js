@@ -9,5 +9,6 @@ router.get("/orders", mocksController.getOrders);
 router.get("/deliveries", mocksController.getDeliveries);
 router.get("/dataset", mocksController.getDataset);
 router.post("/seed", mocksController.generateSeed);
+router.get("/logger-test", mocksController.testLogger);
 
 export default router;

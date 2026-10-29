@@ -1,4 +1,5 @@
 import AppError, { ErrorDictionary } from "../utils/errors.js";
+import logger from "../utils/logger.js";
 
 const errorHandler = (err, req, res, next) => {
   if (err.name === "CastError") {
@@ -22,8 +23,17 @@ const errorHandler = (err, req, res, next) => {
   }
 
   const isAppError = err instanceof AppError;
-
   const definition = isAppError ? err : ErrorDictionary.INTERNAL_SERVER_ERROR;
+
+  const logMessage =
+    `${req.method} ${req.originalUrl} - ${definition.code}: ` +
+    `${isAppError ? definition.message : err.message}`;
+
+  if (definition.statusCode >= 500) {
+    logger.error(logMessage);
+  } else {
+    logger.warning(logMessage);
+  }
 
   res.status(definition.statusCode).json({
     status: "error",

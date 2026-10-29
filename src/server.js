@@ -1,15 +1,16 @@
 import mongoose from "mongoose";
 import app from "./app.js";
 import { config } from "./config/index.js";
+import logger from "./utils/logger.js";
 
 try {
   await mongoose.connect(config.mongoUri);
-  console.log("Conexión a MongoDB establecida");
+  logger.info("Conexión a MongoDB establecida");
 
   app.listen(config.port, () => {
-    console.log(`Servidor corriendo en puerto ${config.port}`);
+    logger.info(`Servidor corriendo en puerto ${config.port}`);
   });
 } catch (error) {
-  console.error("No fue posible conectar con MongoDB:", error.message);
+  logger.fatal(`No fue posible conectar con MongoDB:, ${error.message}`);
   process.exit(1);
 }

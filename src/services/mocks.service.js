@@ -6,8 +6,16 @@ import {
   DELIVERY_STATUS,
   DELIVERY_PRIORITY,
 } from "../utils/constants.js";
+import AppError from "../utils/errors.js";
+import logger from "../utils/logger.js";
 
 class MocksService {
+  validateQuantity(qty) {
+    if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+      logger.warning(`Cantidad de mocks inválida recibida: ${qty}`);
+      throw AppError.fromCode("INVALID_MOCK_QUANTITY");
+    }
+  }
   generateUser(role = USER_ROLES.CUSTOMER) {
     return {
       firstName: faker.person.firstName(),
@@ -18,16 +26,19 @@ class MocksService {
   }
 
   async generateUsers(qty = 2) {
+    this.validateQuantity(qty);
     return Array.from({ length: qty }, () => this.generateUser());
   }
 
   async generateDrivers(qty = 2) {
+    this.validateQuantity(qty);
     return Array.from({ length: qty }, () =>
       this.generateUser(USER_ROLES.DRIVER),
     );
   }
 
   async generateRelatedData(qty = 2) {
+    this.validateQuantity(qty);
     const users = Array.from({ length: qty }, () => ({
       id: faker.string.uuid(),
       ...this.generateUser(USER_ROLES.CUSTOMER),
@@ -93,11 +104,13 @@ class MocksService {
   }
 
   async generateOrders(qty = 2) {
+    this.validateQuantity(qty);
     const data = await this.generateRelatedData(qty);
     return data.orders;
   }
 
   async generateDeliveries(qty = 2) {
+    this.validateQuantity(qty);
     const data = await this.generateRelatedData(qty);
     return data.deliveries;
   }
