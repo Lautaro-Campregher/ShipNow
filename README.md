@@ -107,7 +107,7 @@ ShipNow/
 │   ├── utils/
 │   │   ├── constants.js
 │   │   ├── errors.js
-│   │   └── user.service.js
+│   │   └── logger.js
 │   │
 │   └── server.js
 │   └── app.js
