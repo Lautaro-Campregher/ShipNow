@@ -19,6 +19,15 @@ const customLevels = {
   },
 };
 
+winston.addColors({
+  fatal: "bold red",
+  error: "red",
+  warning: "yellow",
+  info: "green",
+  http: "magenta",
+  debug: "blue",
+});
+
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
   winston.format.printf(({ timestamp, level, message }) => {
@@ -31,7 +40,9 @@ const logger = winston.createLogger({
   level: config.nodeEnv === "production" ? "info" : "debug",
   format: logFormat,
   transports: [
-    new winston.transports.Console(),
+    new winston.transports.Console({
+      format: winston.format.combine(winston.format.colorize(), logFormat),
+    }),
     new DailyRotateFile({
       dirname: logsDirectory,
       filename: "error-%DATE%.log",

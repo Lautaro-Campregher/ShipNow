@@ -375,7 +375,6 @@ Los registros `error` y `fatal` se almacenan en la carpeta `logs/`, mediante arc
 
 La rotación está configurada con Winston Daily Rotate File:
 
-- Tamaño máximo por archivo: `5 MB`.
 - Retención: `14 días`.
 - Rotación por fecha.
 - Los registros de menor severidad no se persisten en estos archivos.
@@ -384,11 +383,13 @@ La carpeta `logs/` está excluida del repositorio mediante `.gitignore`.
 
 ### Endpoint de prueba
 
-En desarrollo se puede probar el logger mediante:
+En desarrollo se puede probar el logger mediante el siguiente endpoint:
 
-`GET /api/mocks/logger-test`
+`GET http://localhost:8080/api/mocks/logger-test`
 
-El endpoint emite un registro por cada uno de los seis niveles. Las rutas de mocks no están disponibles en producción.
+El endpoint emite un registro por cada uno de los seis niveles: `fatal`, `error`, `warning`, `info`, `http` y `debug`.
+
+Las rutas de mocks no están disponibles en producción.
 
 ### Archivos excluidos de Git
 
