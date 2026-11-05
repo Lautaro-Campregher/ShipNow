@@ -33,7 +33,7 @@ class UserService {
 
     return this.repository.create({
       ...userData,
-      role: USER_ROLES.USER,
+      role: USER_ROLES.CUSTOMER,
     });
   }
 

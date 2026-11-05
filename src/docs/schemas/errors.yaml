@@ -1,0 +1,18 @@
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+        - code
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Usuario no encontrado
+        code:
+          type: string
+          example: USER_NOT_FOUND

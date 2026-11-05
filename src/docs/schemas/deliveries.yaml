@@ -1,0 +1,120 @@
+components:
+  schemas:
+    Delivery:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 672a1b2c3d4e5f6789012345
+        order:
+          type: string
+          description: ID del pedido asociado
+          example: 672a1b2c3d4e5f6789012346
+        driver:
+          type: string
+          nullable: true
+          description: ID del repartidor asignado
+          example: 672a1b2c3d4e5f6789012347
+        status:
+          type: string
+          enum:
+            - pending
+            - assigned
+            - in_transit
+            - delivered
+          example: pending
+        priority:
+          type: string
+          enum:
+            - low
+            - normal
+            - high
+          example: normal
+        assignedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-11-05T14:00:00.000Z"
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DeliveryCreateInput:
+      type: object
+      required:
+        - order
+      properties:
+        order:
+          type: string
+          description: ID del pedido asociado
+          example: 672a1b2c3d4e5f6789012346
+        driver:
+          type: string
+          nullable: true
+          description: ID del repartidor asignado
+          example: 672a1b2c3d4e5f6789012347
+        status:
+          type: string
+          enum:
+            - pending
+            - assigned
+            - in_transit
+            - delivered
+          example: pending
+        priority:
+          type: string
+          enum:
+            - low
+            - normal
+            - high
+          example: normal
+        assignedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    DeliveryUpdateInput:
+      type: object
+      properties:
+        order:
+          type: string
+          example: 672a1b2c3d4e5f6789012346
+        driver:
+          type: string
+          nullable: true
+          example: 672a1b2c3d4e5f6789012347
+        status:
+          type: string
+          enum:
+            - pending
+            - assigned
+            - in_transit
+            - delivered
+          example: assigned
+        priority:
+          type: string
+          enum:
+            - low
+            - normal
+            - high
+          example: high
+        assignedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true

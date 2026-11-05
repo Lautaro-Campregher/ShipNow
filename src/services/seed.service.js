@@ -94,7 +94,6 @@ class SeedService {
         orderRepository.setDelivery(delivery.order, delivery._id),
       ),
     );
-
     const result = {
       insertados: {
         usuarios: insertedUsers.length,

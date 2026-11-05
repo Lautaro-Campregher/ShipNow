@@ -1,0 +1,11 @@
+components:
+  schemas:
+    LoggerTestResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Se generaron logs de prueba en todos los niveles

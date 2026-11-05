@@ -1,0 +1,23 @@
+components:
+  schemas:
+    SeedResult:
+      type: object
+      properties:
+        insertados:
+          type: object
+          properties:
+            usuarios:
+              type: integer
+              example: 15
+            clientes:
+              type: integer
+              example: 10
+            repartidores:
+              type: integer
+              example: 5
+            pedidos:
+              type: integer
+              example: 10
+            entregas:
+              type: integer
+              example: 10

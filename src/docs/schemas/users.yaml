@@ -1,0 +1,74 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 672a1b2c3d4e5f6789012345
+        firstName:
+          type: string
+          example: Lautaro
+        lastName:
+          type: string
+          example: Campregher
+        email:
+          type: string
+          format: email
+          example: lautaro@example.com
+        role:
+          type: string
+          example: customer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserCreateInput:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+          example: Lautaro
+        lastName:
+          type: string
+          example: Campregher
+        email:
+          type: string
+          format: email
+          example: lautaro@example.com
+        password:
+          type: string
+          format: password
+          example: Password123!
+        role:
+          type: string
+          example: customer
+
+    UserUpdateInput:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: Lautaro
+        lastName:
+          type: string
+          example: Campregher
+        email:
+          type: string
+          format: email
+          example: lautaro@example.com
+        password:
+          type: string
+          format: password
+          example: Password123!
+        role:
+          type: string
+          example: customer

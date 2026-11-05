@@ -1,0 +1,22 @@
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+          example: success
+        payload:
+          description: Datos devueltos por la operación
+          oneOf:
+            - type: object
+              additionalProperties: true
+            - type: array
+              items:
+                type: object
+                additionalProperties: true
+        message:
+          type: string
+          description: Mensaje descriptivo de la operación, cuando corresponda

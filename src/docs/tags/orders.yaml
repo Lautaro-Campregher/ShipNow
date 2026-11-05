@@ -1,0 +1,302 @@
+paths:
+  /api/orders:
+    get:
+      tags:
+        - Orders
+      summary: Listar pedidos
+      responses:
+        "200":
+          description: Lista de pedidos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+    post:
+      tags:
+        - Orders
+      summary: Crear pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderCreateInput"
+      responses:
+        "201":
+          description: Pedido creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          description: Datos del pedido no válidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                customerNotFound:
+                  summary: Cliente inexistente
+                  value:
+                    status: error
+                    message: El cliente especificado no existe
+                    code: ORDER_CUSTOMER_NOT_FOUND
+                itemsRequired:
+                  summary: Pedido sin artículos
+                  value:
+                    status: error
+                    message: El pedido debe tener al menos un item
+                    code: ORDER_ITEMS_REQUIRED
+                validationError:
+                  summary: Datos inválidos
+                  value:
+                    status: error
+                    message: Los datos enviados no son válidos
+                    code: VALIDATION_ERROR
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+  /api/orders/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador del pedido
+        schema:
+          type: string
+
+    get:
+      tags:
+        - Orders
+      summary: Obtener pedido por ID
+      responses:
+        "200":
+          description: Pedido obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          description: ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  summary: ID inválido
+                  value:
+                    status: error
+                    message: El ID proporcionado no es válido
+                    code: INVALID_ID
+        "404":
+          description: Pedido no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                orderNotFound:
+                  summary: Pedido inexistente
+                  value:
+                    status: error
+                    message: Pedido no encontrado
+                    code: ORDER_NOT_FOUND
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+    put:
+      tags:
+        - Orders
+      summary: Actualizar pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderUpdateInput"
+            example:
+              customer: "672a1b2c3d4e5f6789012345"
+              items:
+                - name: Auriculares inalámbricos
+                  quantity: 2
+                  price: 15000
+              deliveryAddress: Av. Colón 123, Córdoba
+              total: 30000
+              shippingCost: 1000
+              declaredValue: 30000
+              status: created
+              priority: normal
+              delivery: null
+      responses:
+        "200":
+          description: Pedido actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          description: ID o datos enviados no válidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  summary: ID inválido
+                  value:
+                    status: error
+                    message: El ID proporcionado no es válido
+                    code: INVALID_ID
+                validationError:
+                  summary: Datos inválidos
+                  value:
+                    status: error
+                    message: Los datos enviados no son válidos
+                    code: VALIDATION_ERROR
+        "404":
+          description: Pedido no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                orderNotFound:
+                  summary: Pedido inexistente
+                  value:
+                    status: error
+                    message: Pedido no encontrado
+                    code: ORDER_NOT_FOUND
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+    delete:
+      tags:
+        - Orders
+      summary: Eliminar pedido
+      responses:
+        "200":
+          description: Pedido eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Pedido eliminado
+        "400":
+          description: ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  summary: ID inválido
+                  value:
+                    status: error
+                    message: El ID proporcionado no es válido
+                    code: INVALID_ID
+        "404":
+          description: Pedido no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                orderNotFound:
+                  summary: Pedido inexistente
+                  value:
+                    status: error
+                    message: Pedido no encontrado
+                    code: ORDER_NOT_FOUND
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR

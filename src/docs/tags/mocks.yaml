@@ -1,0 +1,380 @@
+/api/mocks/users:
+  get:
+    tags:
+      - Mocks
+    description: >
+      Genera usuarios clientes, repartidores, pedidos y entregas
+      relacionados entre sí.
+    summary: Generar usuarios de prueba
+    parameters:
+      - in: query
+        name: qty
+        required: false
+        description: Cantidad de usuarios a generar.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 2
+    responses:
+      "200":
+        description: Usuarios generados correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                payload:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+      "400":
+        description: Cantidad solicitada no válida
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              invalidQuantity:
+                summary: Cantidad inválida
+                value:
+                  status: error
+                  message: La cantidad solicitada para los mocks no es válida
+                  code: INVALID_MOCK_QUANTITY
+      "500":
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              internalServerError:
+                summary: Error interno
+                value:
+                  status: error
+                  message: Error interno del servidor
+                  code: INTERNAL_SERVER_ERROR
+
+/api/mocks/drivers:
+  get:
+    tags:
+      - Mocks
+    summary: Generar repartidores de prueba
+    parameters:
+      - in: query
+        name: qty
+        required: false
+        description: Cantidad de repartidores a generar.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 2
+    responses:
+      "200":
+        description: Repartidores generados correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                payload:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+      "400":
+        description: Cantidad solicitada no válida
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              invalidQuantity:
+                summary: Cantidad inválida
+                value:
+                  status: error
+                  message: La cantidad solicitada para los mocks no es válida
+                  code: INVALID_MOCK_QUANTITY
+      "500":
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              internalServerError:
+                summary: Error interno
+                value:
+                  status: error
+                  message: Error interno del servidor
+                  code: INTERNAL_SERVER_ERROR
+
+/api/mocks/orders:
+  get:
+    tags:
+      - Mocks
+    summary: Generar pedidos de prueba
+    parameters:
+      - in: query
+        name: qty
+        required: false
+        description: Cantidad de pedidos a generar.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 2
+    responses:
+      "200":
+        description: Pedidos generados correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                payload:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Order"
+      "400":
+        description: Cantidad solicitada no válida
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              invalidQuantity:
+                summary: Cantidad inválida
+                value:
+                  status: error
+                  message: La cantidad solicitada para los mocks no es válida
+                  code: INVALID_MOCK_QUANTITY
+      "500":
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              internalServerError:
+                summary: Error interno
+                value:
+                  status: error
+                  message: Error interno del servidor
+                  code: INTERNAL_SERVER_ERROR
+
+/api/mocks/deliveries:
+  get:
+    tags:
+      - Mocks
+    summary: Generar entregas de prueba
+    parameters:
+      - in: query
+        name: qty
+        required: false
+        description: Cantidad de entregas a generar.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 2
+    responses:
+      "200":
+        description: Entregas generadas correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                payload:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Delivery"
+      "400":
+        description: Cantidad solicitada no válida
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              invalidQuantity:
+                summary: Cantidad inválida
+                value:
+                  status: error
+                  message: La cantidad solicitada para los mocks no es válida
+                  code: INVALID_MOCK_QUANTITY
+      "500":
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              internalServerError:
+                summary: Error interno
+                value:
+                  status: error
+                  message: Error interno del servidor
+                  code: INTERNAL_SERVER_ERROR
+
+/api/mocks/dataset:
+  get:
+    tags:
+      - Mocks
+    summary: Generar conjunto de datos relacionados
+    description: Genera usuarios, repartidores, pedidos y entregas relacionados entre sí.
+    parameters:
+      - in: query
+        name: qty
+        required: false
+        description: Cantidad base de clientes y pedidos a generar.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 2
+    responses:
+      "200":
+        description: Conjunto de datos generado correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                payload:
+                  type: object
+                  properties:
+                    users:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/User"
+                    drivers:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/User"
+                    orders:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Order"
+                    deliveries:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Delivery"
+      "400":
+        description: Cantidad solicitada no válida
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              invalidQuantity:
+                summary: Cantidad inválida
+                value:
+                  status: error
+                  message: La cantidad solicitada para los mocks no es válida
+                  code: INVALID_MOCK_QUANTITY
+      "500":
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              internalServerError:
+                summary: Error interno
+                value:
+                  status: error
+                  message: Error interno del servidor
+                  code: INTERNAL_SERVER_ERROR
+
+/api/mocks/seed:
+  post:
+    tags:
+      - Mocks
+    summary: Generar datos de prueba relacionados
+    description: >
+      Genera usuarios clientes, repartidores, pedidos y entregas
+      relacionados entre sí.
+    parameters:
+      - in: query
+        name: qty
+        required: false
+        description: Cantidad de clientes y pedidos a generar. Se generan además repartidores.
+    schema:
+      type: integer
+      minimum: 1
+      maximum: 100
+      default: 10
+    responses:
+      "201":
+        description: Datos de prueba generados correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                payload:
+                  type: object
+                  properties:
+                    insertados:
+                      type: object
+                      properties:
+                        usuarios:
+                          type: integer
+                          example: 15
+                        clientes:
+                          type: integer
+                          example: 10
+                        repartidores:
+                          type: integer
+                          example: 5
+                        pedidos:
+                          type: integer
+                          example: 10
+                        entregas:
+                          type: integer
+                          example: 10
+      "400":
+        description: Cantidad de datos solicitada no válida
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              invalidQuantity:
+                summary: Cantidad inválida
+                value:
+                  status: error
+                  message: La cantidad solicitada para los mocks no es válida
+                  code: INVALID_MOCK_QUANTITY
+      "500":
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              internalServerError:
+                summary: Error interno
+                value:
+                  status: error
+                  message: Error interno del servidor
+                  code: INTERNAL_SERVER_ERROR

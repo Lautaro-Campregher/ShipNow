@@ -1,0 +1,284 @@
+paths:
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Listar usuarios
+      responses:
+        "200":
+          description: Lista de usuarios obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+    post:
+      tags:
+        - Users
+      summary: Crear usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateInput"
+      responses:
+        "201":
+          description: Usuario creado correctamente
+          content:
+            application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Datos enviados no válidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                validationError:
+                  summary: Datos inválidos
+                  value:
+                    status: error
+                    message: Los datos enviados no son válidos
+                    code: VALIDATION_ERROR
+        "409":
+          description: El email ya se encuentra registrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                duplicateEmail:
+                  summary: Email duplicado
+                  value:
+                    status: error
+                    message: Este email ya se encuentra registrado
+                    code: USER_EMAIL_ALREADY_EXISTS
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+  /api/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador del usuario
+        schema:
+          type: string
+
+    get:
+      tags:
+        - Users
+      summary: Obtener usuario por ID
+      responses:
+        "200":
+          description: Usuario obtenido correctamente
+          content:
+            application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  summary: ID inválido
+                  value:
+                    status: error
+                    message: El ID proporcionado no es válido
+                    code: INVALID_ID
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                userNotFound:
+                  summary: Usuario inexistente
+                  value:
+                    status: error
+                    message: Usuario no encontrado
+                    code: USER_NOT_FOUND
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+    put:
+      tags:
+        - Users
+      summary: Actualizar usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateInput"
+      responses:
+        "200":
+          description: Usuario actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: ID o datos enviados no válidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  summary: ID inválido
+                  value:
+                    status: error
+                    message: El ID proporcionado no es válido
+                    code: INVALID_ID
+                validationError:
+                  summary: Datos inválidos
+                  value:
+                    status: error
+                    message: Los datos enviados no son válidos
+                    code: VALIDATION_ERROR
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                userNotFound:
+                  summary: Usuario inexistente
+                  value:
+                    status: error
+                    message: Usuario no encontrado
+                    code: USER_NOT_FOUND
+        "409":
+          description: El email ya se encuentra registrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                duplicateEmail:
+                  summary: Email duplicado
+                  value:
+                    status: error
+                    message: Este email ya se encuentra registrado
+                    code: USER_EMAIL_ALREADY_EXISTS
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+    delete:
+      tags:
+        - Users
+      summary: Eliminar usuario
+      responses:
+        "200":
+          description: Usuario eliminado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  summary: Usuario eliminado
+                  value:
+                    status: success
+                    message: Usuario eliminado
+        "400":
+          description: ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  summary: ID inválido
+                  value:
+                    status: error
+                    message: El ID proporcionado no es válido
+                    code: INVALID_ID
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                userNotFound:
+                  summary: Usuario inexistente
+                  value:
+                    status: error
+                    message: Usuario no encontrado
+                    code: USER_NOT_FOUND
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR

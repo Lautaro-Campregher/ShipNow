@@ -76,11 +76,29 @@ ShipNow/
 ├── src/
 │   ├── config/
 │   │   └── index.js
+│   │   └── swagger.js
 │   ├── controllers/
 │   │   ├── deliveries.controller.js
 │   │   ├── mocks.controller.js
 │   │   ├── orders.controller.js
 │   │   └── user.controller.js
+│   │
+│   ├── docs/
+│   │    │
+│   │    ├── schemas/
+│   │    │   ├── users.yaml
+│   │    │   ├── orders.yaml
+│   │    │   ├── deliveries.yaml
+│   │    │   ├── errors.yaml
+│   │    │   ├── mocks.yaml
+│   │    │   └── success.yaml
+│   │    └── tags/
+│   │        ├── users.yaml
+│   │        ├── orders.yaml
+│   │        ├── deliveries.yaml
+│   │        ├── mocks.yaml
+│   │        └── logger.yaml
+│   │
 │   ├── middlewares/
 │   │   ├── errorHandler.js
 │   │   └── routeNotFoundHandler.js
@@ -105,12 +123,12 @@ ShipNow/
 │   │   ├── seed.service.js
 │   │   └── user.service.js
 │   ├── utils/
-│   │   ├── constants.js
-│   │   ├── errors.js
-│   │   └── logger.js
-│   │
-│   └── server.js
-│   └── app.js
+│       ├── constants.js
+│       ├── errors.js
+│       └── logger.js
+│
+├── server.js
+├── app.js
 ├── .env.example
 ├── .gitignore
 ├── package.json
@@ -383,13 +401,13 @@ La carpeta `logs/` está excluida del repositorio mediante `.gitignore`.
 
 ### Endpoint de prueba
 
-En desarrollo se puede probar el logger mediante el siguiente endpoint:
+El logger dispone de un endpoint para verificar los distintos niveles de logging:
 
-`GET http://localhost:8080/api/mocks/logger-test`
+`GET http://localhost:8080/api/logger/test`
 
-El endpoint emite un registro por cada uno de los seis niveles: `fatal`, `error`, `warning`, `info`, `http` y `debug`.
+La solicitud genera mensajes de prueba en los seis niveles configurados: `fatal`, `error`, `warning`, `info`, `http` y `debug`.
 
-Las rutas de mocks no están disponibles en producción.
+Este endpoint funciona como herramienta de validación del sistema de logging y no representa una operación de negocio.
 
 ### Archivos excluidos de Git
 
@@ -406,6 +424,28 @@ Los archivos de registro se almacenan en la carpeta `logs/`, ubicada en la **ra�
 Esta carpeta se genera o utiliza durante la ejecución de la aplicación y contiene los archivos de log rotativos, por ejemplo, `error-2026-10-28.log`.
 
 La carpeta `logs/` está incluida en `.gitignore`, por lo que los registros generados localmente no se suben al repositorio de GitHub.
+
+## Documentación de la API con Swagger
+
+ShipNow utiliza Swagger y OpenAPI para documentar los endpoints y facilitar su consulta y prueba.
+
+La documentación interactiva está disponible en:
+
+`http://localhost:8080/api/docs`
+
+Desde Swagger UI se pueden consultar los métodos HTTP, las rutas, los parámetros, los cuerpos de las solicitudes, las respuestas exitosas y los posibles errores.
+
+La documentación está organizada en los siguientes módulos:
+
+- **Users:** operaciones CRUD de usuarios.
+- **Orders:** operaciones CRUD de pedidos.
+- **Deliveries:** operaciones CRUD de entregas.
+- **Mocks:** generación de datos ficticios e inserción de datos de prueba mediante seed.
+- **Logger:** endpoint de prueba para verificar los niveles de logging.
+
+La configuración general de OpenAPI se encuentra en `src/config/swagger.js`. Las definiciones de endpoints y esquemas reutilizables están separadas en archivos YAML dentro de `src/docs/`.
+
+Para utilizar Swagger, primero se debe iniciar el servidor con `npm run dev` y luego ingresar a la URL indicada.
 
 ## Scripts disponibles
 

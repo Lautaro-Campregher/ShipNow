@@ -1,0 +1,13 @@
+/api/logger/test:
+  get:
+    tags:
+      - Logger
+    summary: Probar los niveles del logger
+    description: Genera mensajes de prueba en los distintos niveles de logging configurados.
+    responses:
+  "200":
+    description: Logs de prueba generados correctamente
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/LoggerTestResponse"
