@@ -9,12 +9,14 @@ paths:
           description: Listado de entregas obtenido correctamente
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
               example:
                 status: success
                 payload:
-                  - _id: 672a1b2c3d4e5f6789012345
-                    order: 672a1b2c3d4e5f6789012346
-                    driver: 672a1b2c3d4e5f6789012347
+                  - _id: "672a1b2c3d4e5f6789012345"
+                    order: "672a1b2c3d4e5f6789012346"
+                    driver: "672a1b2c3d4e5f6789012347"
                     status: pending
                     priority: normal
                     assignedAt: null
@@ -47,12 +49,14 @@ paths:
           description: Entrega creada correctamente
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
               example:
                 status: success
                 payload:
-                  _id: 672a1b2c3d4e5f6789012345
-                  order: 672a1b2c3d4e5f6789012346
-                  driver: 672a1b2c3d4e5f6789012347
+                  _id: "672a1b2c3d4e5f6789012345"
+                  order: "672a1b2c3d4e5f6789012346"
+                  driver: "672a1b2c3d4e5f6789012347"
                   status: pending
                   priority: normal
                   assignedAt: null
@@ -107,11 +111,13 @@ paths:
           description: Entrega obtenida correctamente
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
               example:
                 status: success
                 payload:
-                  _id: 672a1b2c3d4e5f6789012345
-                  order: 672a1b2c3d4e5f6789012346
+                  _id: "672a1b2c3d4e5f6789012345"
+                  order: "672a1b2c3d4e5f6789012346"
                   driver: null
                   status: pending
                   priority: normal
@@ -164,12 +170,14 @@ paths:
           description: Entrega actualizada correctamente
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
               example:
                 status: success
                 payload:
-                  _id: 672a1b2c3d4e5f6789012345
-                  order: 672a1b2c3d4e5f6789012346
-                  driver: 672a1b2c3d4e5f6789012347
+                  _id: "672a1b2c3d4e5f6789012345"
+                  order: "672a1b2c3d4e5f6789012346"
+                  driver: "672a1b2c3d4e5f6789012347"
                   status: assigned
                   priority: high
         "400":
@@ -229,6 +237,8 @@ paths:
           description: Entrega eliminada correctamente
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
               example:
                 status: success
                 message: Entrega eliminada

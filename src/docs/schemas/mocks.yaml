@@ -21,3 +21,14 @@ components:
             entregas:
               type: integer
               example: 10
+
+    SeedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+          example: success
+        payload:
+          $ref: "#/components/schemas/SeedResult"

@@ -5,6 +5,8 @@ components:
       properties:
         status:
           type: string
+          enum:
+            - success
           example: success
         message:
           type: string

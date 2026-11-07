@@ -1,13 +1,23 @@
-/api/logger/test:
-  get:
-    tags:
-      - Logger
-    summary: Probar los niveles del logger
-    description: Genera mensajes de prueba en los distintos niveles de logging configurados.
-    responses:
-  "200":
-    description: Logs de prueba generados correctamente
-    content:
-      application/json:
-        schema:
-          $ref: "#/components/schemas/LoggerTestResponse"
+paths:
+  /api/logger/test:
+    get:
+      tags:
+        - Logger
+      summary: Probar los niveles del logger
+      description: Genera mensajes de prueba en los distintos niveles de logging configurados.
+      responses:
+        "200":
+          description: Logs de prueba generados correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggerTestResponse"
+              example:
+                status: success
+                message: Se generaron logs de prueba en todos los niveles
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

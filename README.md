@@ -123,12 +123,13 @@ ShipNow/
 │   │   ├── seed.service.js
 │   │   └── user.service.js
 │   ├── utils/
-│       ├── constants.js
-│       ├── errors.js
-│       └── logger.js
+│   │    ├── constants.js
+│   │    ├── errors.js
+│   │    └── logger.js
+│   │
+│   ├── server.js
+│   │── app.js
 │
-├── server.js
-├── app.js
 ├── .env.example
 ├── .gitignore
 ├── package.json
