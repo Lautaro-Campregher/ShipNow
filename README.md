@@ -75,7 +75,7 @@ Los errores que se producen durante el procesamiento se propagan hacia el middle
 ShipNow/
 ├── src/
 │   ├── config/
-│   │   └── index.js
+│   │   ├── index.js
 │   │   └── swagger.js
 │   ├── controllers/
 │   │   ├── deliveries.controller.js
