@@ -128,7 +128,17 @@ ShipNow/
 │   │    └── logger.js
 │   │
 │   ├── server.js
-│   │── app.js
+│   └── app.js
+│
+├── tests/
+│       ├── deliveries.test.js
+│       ├── logger.test.js
+│       ├── mocks.test.js
+│       ├── order.test.js
+│       ├── route-not-found.test.js
+│       ├── setup.js
+│       ├── swagger.test.js
+│       └── user.test.js
 │
 ├── .env.example
 ├── .gitignore
@@ -146,7 +156,8 @@ ShipNow/
 - **`routes/`**: definición de los endpoints de la API.
 - **`services/`**: lógica de negocio, generación de datos simulados y carga de registros de prueba.
 - **`utils/`**: constantes compartidas, manejo de errores y utilidades del servidor.
-- **`server.js`**: punto de entrada de la aplicación.
+- **`app.js`**: configura la aplicación Express, registra las rutas y los middlewares, y exporta la instancia para que pueda utilizarse en las pruebas.
+- **`server.js`**: conecta con MongoDB e inicia el servidor HTTP. Si la conexión falla, registra el error y finaliza el proceso.
 
 ### Entidades principales
 
@@ -410,14 +421,6 @@ La solicitud genera mensajes de prueba en los seis niveles configurados: `fatal`
 
 Este endpoint funciona como herramienta de validación del sistema de logging y no representa una operación de negocio.
 
-### Archivos excluidos de Git
-
-El archivo `.gitignore` excluye:
-
-- `node_modules/`: dependencias instaladas.
-- `.env`: variables de entorno y configuración local.
-- `logs/`: archivos de registro generados durante la ejecución.
-
 ### Ubicación de los archivos de log
 
 Los archivos de registro se almacenan en la carpeta `logs/`, ubicada en la **raíz del proyecto**, al mismo nivel que `src/`, `node_modules/` y `package.json`.
@@ -448,10 +451,98 @@ La configuración general de OpenAPI se encuentra en `src/config/swagger.js`. La
 
 Para utilizar Swagger, primero se debe iniciar el servidor con `npm run dev` y luego ingresar a la URL indicada.
 
+## Testing y pruebas automatizadas
+
+El proyecto cuenta con una suite de pruebas funcionales automatizadas desarrollada con **Mocha, Chai y Supertest**. Estas herramientas permiten verificar el comportamiento de los endpoints HTTP, validar las respuestas y comprobar tanto los casos exitosos como los errores.
+
+### Entorno de testing
+
+Las pruebas utilizan una configuración independiente de la utilizada durante el desarrollo.
+
+En la raíz del proyecto se debe crear el archivo `.env.test` con la siguiente configuración:
+
+```env
+PORT=8081
+MONGODB_URI=mongodb://localhost:27017/ShipNow_testing
+NODE_ENV=test
+```
+
+La base de datos `ShipNow_testing` se utiliza exclusivamente para las pruebas, evitando modificar los datos del entorno de desarrollo.
+
+El archivo `.env.test` está excluido del repositorio mediante `.gitignore`, por lo que cada desarrollador debe configurarlo localmente.
+
+### Ejecución de las pruebas
+
+Para ejecutar la suite completa:
+
+```bash
+npm test
+```
+
+Para ejecutar un archivo de pruebas individual:
+
+```bash
+npx cross-env NODE_ENV=test mocha --file tests/setup.js tests/user.test.js
+```
+
+### Preparación y limpieza de la base de datos
+
+El archivo `tests/setup.js` administra el ciclo de vida de la conexión a MongoDB durante las pruebas:
+
+- **Antes de la suite (`before`):** verifica que la base de datos configurada sea exclusivamente `ShipNow_testing`. Si el nombre no coincide, interrumpe la ejecución para evitar modificaciones accidentales sobre otra base de datos.
+- **Antes de cada prueba (`beforeEach`):** elimina los documentos de las colecciones existentes para garantizar que cada caso comience con datos limpios.
+- **Al finalizar la suite (`after`):** cierra la conexión con MongoDB.
+
+Esta estrategia permite ejecutar las pruebas de forma repetible e independiente de los datos existentes en el entorno de desarrollo.
+
+### Módulos cubiertos
+
+La suite incluye pruebas funcionales para los siguientes módulos:
+
+- **Users:** listado, creación, actualización, eliminación y validaciones.
+- **Orders:** creación, consulta, actualización de estados y eliminación de pedidos.
+- **Deliveries:** creación, consulta, actualización y eliminación de entregas, incluyendo la validación de sus relaciones.
+- **Mocks:** generación de datos ficticios, conjuntos relacionados y persistencia mediante seed.
+- **Logger:** verificación del endpoint de prueba de los niveles de logging.
+- **Swagger:** comprobación del acceso a la documentación interactiva.
+- **Rutas inexistentes:** validación de respuestas HTTP 404 y del formato de error.
+
+### Casos de prueba
+
+Las pruebas contemplan escenarios exitosos y situaciones de error, entre ellas:
+
+- Datos incompletos o inválidos.
+- Recursos inexistentes.
+- Correos electrónicos duplicados.
+- Estados no permitidos.
+- Relaciones inválidas entre usuarios, pedidos y entregas.
+- Cantidades inválidas en los endpoints de mocking.
+- Solicitudes a rutas inexistentes.
+
+Cada prueba verifica el código de estado HTTP y la estructura de la respuesta, además de las propiedades relevantes de los datos cuando corresponde.
+
+### Resultado de la suite
+
+En la última ejecución de la suite completa se obtuvo el siguiente resultado:
+
+**45 pruebas exitosas y 0 pruebas fallidas.**
+
+Esto permite verificar de forma automatizada el funcionamiento de los principales módulos de la API.
+
+### Archivos excluidos de Git
+
+El archivo `.gitignore` excluye:
+
+- `node_modules/`: dependencias instaladas.
+- `.env`: variables de entorno y configuración local.
+- `.env.test`: configuración local del entorno de pruebas.
+- `logs/`: archivos de registro generados durante la ejecución.
+
 ## Scripts disponibles
 
-| Comando       | Uso                                 |
-| ------------- | ----------------------------------- |
-| `npm install` | Instalar dependencias               |
-| `npm run dev` | Iniciar el servidor en desarrollo   |
-| `npm start`   | Iniciar el servidor para producción |
+| Comando       | Uso                                                     |
+| ------------- | ------------------------------------------------------- |
+| `npm install` | Instalar dependencias                                   |
+| `npm run dev` | Ejecuta el servidor en desarrollo                       |
+| `npm start`   | Ejecuta el servidor para producción                     |
+| `npm test`    | Ejecutar la suite completa con Mocha, Chai y Supertest. |
