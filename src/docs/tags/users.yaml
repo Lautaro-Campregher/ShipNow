@@ -50,8 +50,8 @@ paths:
           description: Usuario creado correctamente
           content:
             application/json:
-          schema:
-            $ref: "#/components/schemas/SuccessResponse"
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
         "400":
           description: Datos enviados no válidos
           content:
@@ -110,8 +110,8 @@ paths:
           description: Usuario obtenido correctamente
           content:
             application/json:
-          schema:
-            $ref: "#/components/schemas/SuccessResponse"
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
         "400":
           description: ID inválido
           content:
