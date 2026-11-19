@@ -30,6 +30,11 @@ export const ErrorDictionary = Object.freeze({
     message: "Ruta no encontrada",
     code: "ROUTE_NOT_FOUND",
   },
+  FORBIDDEN: {
+    statusCode: 403,
+    message: "No tiene permisos para realizar esta operación",
+    code: "FORBIDDEN",
+  },
   VALIDATION_ERROR: {
     statusCode: 400,
     message: "Los datos enviados no son válidos",
@@ -89,6 +94,32 @@ export const ErrorDictionary = Object.freeze({
     statusCode: 409,
     message: "Este email ya se encuentra registrado",
     code: "USER_EMAIL_ALREADY_EXISTS",
+  },
+
+  INVALID_FILE_TYPE: {
+    statusCode: 400,
+    message: "El tipo de archivo no está permitido",
+    code: "INVALID_FILE_TYPE",
+  },
+  FILE_TOO_LARGE: {
+    statusCode: 400,
+    message: "El archivo supera el tamaño máximo permitido de 5 MB",
+    code: "FILE_TOO_LARGE",
+  },
+  FILE_REQUIRED: {
+    statusCode: 400,
+    message: "Debe adjuntar un archivo",
+    code: "FILE_REQUIRED",
+  },
+  UPLOAD_ERROR: {
+    statusCode: 400,
+    message: "Error al procesar la carga del archivo",
+    code: "UPLOAD_ERROR",
+  },
+  INVALID_DOCUMENT_TYPE: {
+    statusCode: 400,
+    message: "El tipo de documento no es válido",
+    code: "INVALID_DOCUMENT_TYPE",
   },
 });
 

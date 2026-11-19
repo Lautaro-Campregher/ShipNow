@@ -1,26 +1,36 @@
 import AppError, { ErrorDictionary } from "../utils/errors.js";
 import logger from "../utils/logger.js";
+import multer from "multer";
 
 const errorHandler = (err, req, res, next) => {
-  if (err.name === "CastError") {
-    err = new AppError(ErrorDictionary.INVALID_ID);
-  } else if (
-    err.type === "entity.parse.failed" ||
-    (err instanceof SyntaxError && err.status === 400 && "body" in err)
-  ) {
-    err = new AppError(ErrorDictionary.INVALID_JSON);
-  } else if (err.name === "ValidationError") {
-    err = new AppError(ErrorDictionary.VALIDATION_ERROR);
-  } else if (err.code === 11000) {
-    err = new AppError(ErrorDictionary.RESOURCE_CONFLICT);
-  } else if (
-    err.name === "MongoServerError" ||
-    err.name === "MongooseServerSelectionError" ||
-    err.name === "MongoNetworkError" ||
-    err.name === "MongoNetworkTimeoutError"
-  ) {
-    err = new AppError(ErrorDictionary.DATABASE_ERROR);
-  }
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      err = new AppError(ErrorDictionary.FILE_TOO_LARGE);
+    } else {
+      err = new AppError(ErrorDictionary.UPLOAD_ERROR);
+    }
+  } else if (err.code === "INVALID_FILE_TYPE") {
+    err = new AppError(ErrorDictionary.INVALID_FILE_TYPE);
+  } else if (err.name === "CastError")
+    if (err.name === "CastError") {
+      err = new AppError(ErrorDictionary.INVALID_ID);
+    } else if (
+      err.type === "entity.parse.failed" ||
+      (err instanceof SyntaxError && err.status === 400 && "body" in err)
+    ) {
+      err = new AppError(ErrorDictionary.INVALID_JSON);
+    } else if (err.name === "ValidationError") {
+      err = new AppError(ErrorDictionary.VALIDATION_ERROR);
+    } else if (err.code === 11000) {
+      err = new AppError(ErrorDictionary.RESOURCE_CONFLICT);
+    } else if (
+      err.name === "MongoServerError" ||
+      err.name === "MongooseServerSelectionError" ||
+      err.name === "MongoNetworkError" ||
+      err.name === "MongoNetworkTimeoutError"
+    ) {
+      err = new AppError(ErrorDictionary.DATABASE_ERROR);
+    }
 
   const isAppError = err instanceof AppError;
   const definition = isAppError ? err : ErrorDictionary.INTERNAL_SERVER_ERROR;

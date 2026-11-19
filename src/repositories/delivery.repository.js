@@ -20,6 +20,14 @@ class DeliveryRepository {
     });
   }
 
+  async addProof(deliveryId, proofMetadata) {
+    return Delivery.findByIdAndUpdate(
+      deliveryId,
+      { $push: { proofs: proofMetadata } },
+      { new: true, runValidators: true },
+    );
+  }
+
   async delete(id) {
     return Delivery.findByIdAndDelete(id);
   }

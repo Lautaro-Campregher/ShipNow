@@ -5,6 +5,12 @@ export const USER_ROLES = Object.freeze({
   STORE: "store",
 });
 
+export const DOCUMENT_TYPES = Object.freeze({
+  IDENTITY: "identity",
+  ADDRESS: "address",
+  OTHER: "other",
+});
+
 export const ORDER_STATUS = Object.freeze({
   CREATED: "created",
   ASSIGNED: "assigned",

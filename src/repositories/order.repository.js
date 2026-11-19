@@ -20,6 +20,21 @@ class OrderRepository {
     });
   }
 
+  async addProof(orderId, proofMetadata) {
+    return Order.findByIdAndUpdate(
+      orderId,
+      {
+        $push: {
+          proofs: proofMetadata,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+  }
+
   async delete(id) {
     return Order.findByIdAndDelete(id);
   }

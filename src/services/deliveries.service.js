@@ -2,6 +2,7 @@ import deliveryRepository from "../repositories/delivery.repository.js";
 import orderRepository from "../repositories/order.repository.js";
 import userRepository from "../repositories/user.repository.js";
 import AppError from "../utils/errors.js";
+import path from "path";
 import {
   USER_ROLES,
   DELIVERY_STATUS,
@@ -71,6 +72,26 @@ class DeliveriesService {
     if (!updatedDelivery) {
       throw AppError.fromCode("DELIVERY_NOT_FOUND");
     }
+
+    return updatedDelivery;
+  }
+
+  async addProof(deliveryId, file) {
+    await this.findById(deliveryId);
+
+    const proofMetadata = {
+      originalName: file.originalname,
+      fileName: file.filename,
+      path: path.relative(process.cwd(), file.path).replace(/\\/g, "/"),
+      mimeType: file.mimetype,
+      size: file.size,
+      type: "delivery_proof",
+    };
+
+    const updatedDelivery = await deliveryRepository.addProof(
+      deliveryId,
+      proofMetadata,
+    );
 
     return updatedDelivery;
   }

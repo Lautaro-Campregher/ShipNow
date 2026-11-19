@@ -3,6 +3,7 @@ import userRepository from "../repositories/user.repository.js";
 import AppError from "../utils/errors.js";
 import { ORDER_STATUS, ORDER_PRIORITY } from "../utils/constants.js";
 import logger from "../utils/logger.js";
+import path from "path";
 
 class OrdersService {
   async findAll(filter = {}) {
@@ -59,6 +60,25 @@ class OrdersService {
     if (!updatedOrder) {
       throw AppError.fromCode("ORDER_NOT_FOUND");
     }
+
+    return updatedOrder;
+  }
+
+  async addProof(orderId, file) {
+    await this.findById(orderId);
+
+    const proofMetadata = {
+      originalName: file.originalname,
+      fileName: file.filename,
+      path: path.relative(process.cwd(), file.path).replace(/\\/g, "/"),
+      mimeType: file.mimetype,
+      size: file.size,
+      type: "order_proof",
+    };
+
+    const updatedOrder = await orderRepository.addProof(orderId, proofMetadata);
+
+    logger.info(`Comprobante agregado correctamente. Pedido: ${orderId}`);
 
     return updatedOrder;
   }

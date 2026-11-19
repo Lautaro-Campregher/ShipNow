@@ -21,6 +21,40 @@ const orderItemSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const proofSchema = new mongoose.Schema(
+  {
+    originalName: {
+      type: String,
+      required: true,
+    },
+    fileName: {
+      type: String,
+      required: true,
+    },
+    path: {
+      type: String,
+      required: true,
+    },
+    mimeType: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false },
+);
+
 const orderSchema = new mongoose.Schema(
   {
     customer: {
@@ -66,6 +100,10 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Delivery",
       default: null,
+    },
+    proofs: {
+      type: [proofSchema],
+      default: [],
     },
   },
   { timestamps: true },

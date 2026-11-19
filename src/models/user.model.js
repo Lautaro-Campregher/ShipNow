@@ -1,6 +1,73 @@
 import mongoose from "mongoose";
 import { USER_ROLES } from "../utils/constants.js";
 
+const documentSchema = new mongoose.Schema(
+  {
+    originalName: {
+      type: String,
+      required: true,
+    },
+    fileName: {
+      type: String,
+      required: true,
+    },
+    path: {
+      type: String,
+      required: true,
+    },
+    mimeType: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false },
+);
+
+const licenseSchema = new mongoose.Schema(
+  {
+    originalName: {
+      type: String,
+      required: true,
+    },
+    fileName: {
+      type: String,
+      required: true,
+    },
+    path: {
+      type: String,
+      required: true,
+    },
+    mimeType: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false },
+);
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -30,12 +97,11 @@ const userSchema = new mongoose.Schema(
       default: USER_ROLES.CUSTOMER,
     },
     documents: {
-      type: [
-        {
-          name: { type: String },
-          reference: { type: String },
-        },
-      ],
+      type: [documentSchema],
+      default: [],
+    },
+    licenses: {
+      type: [licenseSchema],
       default: [],
     },
   },

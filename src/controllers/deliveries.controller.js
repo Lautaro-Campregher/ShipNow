@@ -1,4 +1,7 @@
 import deliveriesService from "../services/deliveries.service.js";
+import AppError from "../utils/errors.js";
+import { deleteUploadedFile } from "../utils/fileDelete.js";
+import logger from "../utils/logger.js";
 
 class DeliveriesController {
   async findAll(req, res, next) {
@@ -33,6 +36,36 @@ class DeliveriesController {
       const delivery = await deliveriesService.update(req.params.id, req.body);
       res.json({ status: "success", payload: delivery });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async addProof(req, res, next) {
+    try {
+      if (!req.file) {
+        throw AppError.fromCode("FILE_REQUIRED");
+      }
+
+      const { id } = req.params;
+
+      const updatedDelivery = await deliveriesService.addProof(id, req.file);
+
+      res.status(201).json({
+        status: "success",
+        message: "Comprobante de la entrega cargado correctamente",
+        payload: updatedDelivery,
+      });
+    } catch (error) {
+      if (req.file?.path) {
+        try {
+          await deleteUploadedFile(req.file.path);
+        } catch (cleanupError) {
+          logger.error(
+            `Error al eliminar archivo huérfano: ${cleanupError.message}`,
+          );
+        }
+      }
+
       next(error);
     }
   }

@@ -32,6 +32,38 @@ class UserRepository {
     }).lean();
   }
 
+  async addDocument(userId, documentMetadata) {
+    return User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          documents: documentMetadata,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+        projection: { password: 0 },
+      },
+    ).lean();
+  }
+
+  async addLicense(userId, licenseMetadata) {
+    return User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          licenses: licenseMetadata,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+        projection: { password: 0 },
+      },
+    ).lean();
+  }
+
   async deleteById(id) {
     return User.findByIdAndDelete(id, { projection: { password: 0 } }).lean();
   }
