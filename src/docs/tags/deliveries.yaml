@@ -27,6 +27,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
 
     post:
       tags:
@@ -73,7 +80,7 @@ paths:
                   value:
                     status: error
                     message: El pedido especificado no existe
-                    code: ORDER_NOT_FOUND
+                    code: DELIVERY_ORDER_NOT_FOUND
                 driverInvalid:
                   summary: El repartidor no existe o no tiene el rol correcto
                   value:
@@ -92,6 +99,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
 
   /api/deliveries/{id}:
     parameters:
@@ -149,6 +163,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
 
     put:
       tags:
@@ -227,6 +248,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
 
     delete:
       tags:
@@ -268,3 +296,109 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR
+
+  /api/deliveries/{id}/proofs:
+    post:
+      tags:
+        - Deliveries
+      summary: Subir comprobante de entrega
+      description: Permite adjuntar un comprobante asociado a una entrega.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la entrega
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Archivo del comprobante de entrega
+      responses:
+        "200":
+          description: Comprobante de entrega subido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Archivo inválido o datos incorrectos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                fileRequired:
+                  summary: Archivo requerido
+                  value:
+                    status: error
+                    message: Debe adjuntar un archivo
+                    code: FILE_REQUIRED
+                invalidFileType:
+                  summary: Tipo de archivo inválido
+                  value:
+                    status: error
+                    message: El tipo de archivo no está permitido
+                    code: INVALID_FILE_TYPE
+                fileTooLarge:
+                  summary: Archivo demasiado grande
+                  value:
+                    status: error
+                    message: El archivo supera el tamaño máximo permitido de 5 MB
+                    code: FILE_TOO_LARGE
+                uploadError:
+                  summary: Error al procesar el archivo
+                  value:
+                    status: error
+                    message: Error al procesar la carga del archivo
+                    code: UPLOAD_ERROR
+
+        "404":
+          description: Entrega no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                deliveryNotFound:
+                  summary: Entrega inexistente
+                  value:
+                    status: error
+                    message: Entrega no encontrada
+                    code: DELIVERY_NOT_FOUND
+
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                databaseError:
+                  summary: Error de base de datos
+                  value:
+                    status: error
+                    message: Error al acceder a la base de datos
+                    code: DATABASE_ERROR
+                internalServerError:
+                  summary: Error interno
+                  value:
+                    status: error
+                    message: Error interno del servidor
+                    code: INTERNAL_SERVER_ERROR

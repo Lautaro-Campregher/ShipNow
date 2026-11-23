@@ -1,6 +1,7 @@
 import UserService from "../services/user.service.js";
 import userRepository from "../repositories/user.repository.js";
 import AppError from "../utils/errors.js";
+import { deleteUploadedFile } from "../utils/fileDelete.js";
 
 const userService = new UserService(userRepository);
 
@@ -78,6 +79,10 @@ class UserController {
         payload: updatedUser,
       });
     } catch (error) {
+      if (req.file?.path) {
+        await deleteUploadedFile(req.file.path);
+      }
+
       next(error);
     }
   }

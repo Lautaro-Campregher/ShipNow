@@ -3,12 +3,13 @@ import request from "supertest";
 import app from "../src/app.js";
 import User from "../src/models/user.model.js";
 import Order from "../src/models/order.model.js";
+import fs from "fs";
+import path from "path";
 import mocksService from "../src/services/mocks.service.js";
 
 describe("Pruebas funcionales - Orders", function () {
   describe("POST /api/orders", function () {
     it("debe crear un pedido y calcular correctamente su total", async function () {
-      // Creamos primero un cliente para asociarlo al pedido.
       const mockUser = mocksService.generateUser();
 
       const customer = await User.create({
@@ -87,6 +88,185 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.code).to.equal("ORDER_ITEMS_REQUIRED");
     });
   });
+
+  describe("POST /api/orders/:id/proofs", function () {
+    it("debe cargar un comprobante correctamente", async function () {
+      const mockUser = mocksService.generateUser();
+
+      const customer = await User.create({
+        ...mockUser,
+        password: "Password123!",
+      });
+
+      const newOrder = {
+        customer: customer._id,
+        items: [
+          {
+            name: "Producto A",
+            quantity: 2,
+            price: 100,
+          },
+        ],
+        deliveryAddress: "Av. Testing 123",
+        shippingCost: 30,
+      };
+
+      const orderResponse = await request(app)
+        .post("/api/orders")
+        .send(newOrder);
+
+      const orderId = orderResponse.body.payload._id;
+
+      const filePath = path.resolve("tests/fixtures/test-image.png");
+
+      const response = await request(app)
+        .post(`/api/orders/${orderId}/proofs`)
+        .attach("file", filePath);
+
+      expect(response.status).to.equal(201);
+      expect(response.body.status).to.equal("success");
+
+      const updatedOrder = await Order.findById(orderId);
+
+      expect(updatedOrder.proofs).to.have.lengthOf(1);
+      expect(updatedOrder.proofs[0].originalName).to.equal("test-image.png");
+      expect(updatedOrder.proofs[0].type).to.equal("order_proof");
+      expect(updatedOrder.proofs[0].mimeType).to.equal("image/png");
+      expect(updatedOrder.proofs[0].size).to.be.greaterThan(0);
+
+      expect(fs.existsSync(path.resolve(updatedOrder.proofs[0].path))).to.equal(
+        true,
+      );
+    });
+
+    it("debe rechazar la carga si no se adjunta un archivo", async function () {
+      const mockUser = mocksService.generateUser();
+
+      const customer = await User.create({
+        ...mockUser,
+        password: "Password123!",
+      });
+
+      const newOrder = {
+        customer: customer._id,
+        items: [{ name: "Producto A", quantity: 1, price: 100 }],
+        deliveryAddress: "Av. Testing 123",
+        shippingCost: 30,
+      };
+
+      const orderResponse = await request(app)
+        .post("/api/orders")
+        .send(newOrder);
+
+      const orderId = orderResponse.body.payload._id;
+
+      const response = await request(app).post(`/api/orders/${orderId}/proofs`);
+
+      expect(response.status).to.equal(400);
+      expect(response.body.status).to.equal("error");
+      expect(response.body.code).to.equal("FILE_REQUIRED");
+
+      const updatedOrder = await Order.findById(orderId);
+
+      expect(updatedOrder.proofs).to.have.lengthOf(0);
+    });
+
+    it("debe rechazar la carga si la orden no existe y eliminar el archivo", async function () {
+      const filesBefore = fs.readdirSync("uploads/proof/orders");
+
+      const response = await request(app)
+        .post("/api/orders/507f1f77bcf86cd799439011/proofs")
+        .attach("file", path.resolve("tests/fixtures/test-image.png"));
+
+      expect(response.status).to.equal(404);
+      expect(response.body.status).to.equal("error");
+
+      const filesAfter = fs.readdirSync("uploads/proof/orders");
+
+      const newFiles = filesAfter.filter((file) => !filesBefore.includes(file));
+
+      expect(newFiles).to.have.lengthOf(0);
+    });
+
+    it("debe rechazar un archivo con formato no permitido", async function () {
+      const mockUser = mocksService.generateUser();
+
+      const customer = await User.create({
+        ...mockUser,
+        password: "Password123!",
+      });
+
+      const newOrder = {
+        customer: customer._id,
+        items: [{ name: "Producto A", quantity: 1, price: 100 }],
+        deliveryAddress: "Av. Testing 123",
+        shippingCost: 30,
+      };
+
+      const orderResponse = await request(app)
+        .post("/api/orders")
+        .send(newOrder);
+
+      const orderId = orderResponse.body.payload._id;
+
+      const response = await request(app)
+        .post(`/api/orders/${orderId}/proofs`)
+        .attach("file", path.resolve("tests/fixtures/test-invalid.txt"));
+
+      expect(response.status).to.equal(400);
+      expect(response.body.status).to.equal("error");
+      expect(response.body.code).to.equal("INVALID_FILE_TYPE");
+
+      const updatedOrder = await Order.findById(orderId);
+
+      expect(updatedOrder.proofs).to.have.lengthOf(0);
+    });
+
+    it("debe rechazar un archivo que supere los 5 MB", async function () {
+      const mockUser = mocksService.generateUser();
+
+      const customer = await User.create({
+        ...mockUser,
+        password: "Password123!",
+      });
+
+      const newOrder = {
+        customer: customer._id,
+        items: [{ name: "Producto A", quantity: 1, price: 100 }],
+        deliveryAddress: "Av. Testing 123",
+        shippingCost: 30,
+      };
+
+      const orderResponse = await request(app)
+        .post("/api/orders")
+        .send(newOrder);
+
+      const orderId = orderResponse.body.payload._id;
+
+      const filesBefore = fs.readdirSync("uploads/proof/orders");
+
+      let response;
+
+      response = await request(app)
+        .post(`/api/orders/${orderId}/proofs`)
+        .attach("file", path.resolve("tests/fixtures/test-large.pdf"));
+
+      expect(response.status).to.equal(400);
+      expect(response.body.status).to.equal("error");
+      expect(response.body.code).to.equal("FILE_TOO_LARGE");
+
+      const updatedOrder = await Order.findById(orderId);
+
+      expect(updatedOrder.proofs).to.have.lengthOf(0);
+
+      const filesAfter = fs.readdirSync("uploads/proof/orders");
+
+      const newFiles = filesAfter.filter((file) => !filesBefore.includes(file));
+
+      expect(newFiles).to.have.lengthOf(0);
+    });
+  });
+
   describe("GET /api/orders", function () {
     it("debe devolver la lista de pedidos", async function () {
       const response = await request(app).get("/api/orders");
@@ -96,6 +276,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.payload).to.be.an("array");
     });
   });
+
   describe("GET /api/orders/:id", function () {
     it("debe devolver un error 404 si el pedido no existe", async function () {
       const response = await request(app).get(
@@ -106,6 +287,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.status).to.equal("error");
       expect(response.body.code).to.equal("ORDER_NOT_FOUND");
     });
+
     it("debe devolver un pedido cuando existe", async function () {
       const mockUser = mocksService.generateUser();
 
@@ -138,6 +320,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.payload.total).to.equal(200);
     });
   });
+
   describe("PUT /api/orders/:id", function () {
     it("debe actualizar un pedido existente", async function () {
       const mockUser = mocksService.generateUser();
@@ -172,6 +355,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.payload.deliveryAddress).to.equal("Av. Nueva 456");
       expect(response.body.payload.total).to.equal(100);
     });
+
     it("debe devolver un error 404 si el pedido no existe", async function () {
       const response = await request(app)
         .put("/api/orders/507f1f77bcf86cd799439011")
@@ -183,6 +367,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.status).to.equal("error");
       expect(response.body.code).to.equal("ORDER_NOT_FOUND");
     });
+
     it("debe rechazar un estado inválido", async () => {
       const customer = await User.create({
         firstName: "Test",
@@ -214,6 +399,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(response.body.status).to.equal("error");
     });
   });
+
   describe("DELETE /api/orders/:id", function () {
     it("debe eliminar un pedido existente", async function () {
       const mockUser = mocksService.generateUser();
@@ -250,6 +436,7 @@ describe("Pruebas funcionales - Orders", function () {
       expect(deletedOrder.status).to.equal(404);
       expect(deletedOrder.body.code).to.equal("ORDER_NOT_FOUND");
     });
+
     it("debe devolver un error 404 si el pedido no existe", async function () {
       const response = await request(app).delete(
         "/api/orders/507f1f77bcf86cd799439011",
