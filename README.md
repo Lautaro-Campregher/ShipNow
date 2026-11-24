@@ -139,6 +139,16 @@ ShipNow/
 │       ├── setup.js
 │       ├── swagger.test.js
 │       └── user.test.js
+├── uploads/
+│       │
+│       ├── documents/
+│       │
+│       ├── driver-licenses/
+│       │
+│       └── proof/
+│            ├── deliveries/
+│            │
+│            └── orders/
 │
 ├── .env.example
 ├── .gitignore
@@ -173,36 +183,66 @@ La URL base de desarrollo es `http://localhost:8080`.
 
 ### Health check y usuarios
 
-| Método | Ruta             | Descripción                   |
-| ------ | ---------------- | ----------------------------- |
-| GET    | `/api/health`    | Verificar el estado de la API |
-| GET    | `/api/users`     | Listar usuarios               |
-| GET    | `/api/users/:id` | Obtener un usuario            |
-| POST   | `/api/users`     | Crear un usuario              |
-| PUT    | `/api/users/:id` | Actualizar un usuario         |
-| DELETE | `/api/users/:id` | Eliminar un usuario           |
+| Método | Ruta                        | Descripción                     |
+| ------ | --------------------------- | ------------------------------- |
+| GET    | `/api/health`               | Verificar el estado de la API   |
+| GET    | `/api/users`                | Listar usuarios                 |
+| GET    | `/api/users/:id`            | Obtener un usuario              |
+| POST   | `/api/users`                | Crear un usuario                |
+| POST   | `/api/users/:uid/documents` | Subir documentación del usuario |
+| POST   | `/api/users/:uid/licenses`  | Subir licencia del usuario      |
+| PUT    | `/api/users/:id`            | Actualizar un usuario           |
+| DELETE | `/api/users/:id`            | Eliminar un usuario             |
 
 ### Pedidos
 
-| Método | Ruta              | Descripción          |
-| ------ | ----------------- | -------------------- |
-| GET    | `/api/orders`     | Listar pedidos       |
-| GET    | `/api/orders/:id` | Obtener un pedido    |
-| POST   | `/api/orders`     | Crear un pedido      |
-| PUT    | `/api/orders/:id` | Actualizar un pedido |
-| DELETE | `/api/orders/:id` | Eliminar un pedido   |
+| Método | Ruta                     | Descripción                  |
+| ------ | ------------------------ | ---------------------------- |
+| GET    | `/api/orders`            | Listar pedidos               |
+| GET    | `/api/orders/:id`        | Obtener un pedido            |
+| POST   | `/api/orders`            | Crear un pedido              |
+| POST   | `/api/orders/:id/proofs` | Subir comprobante del pedido |
+| PUT    | `/api/orders/:id`        | Actualizar un pedido         |
+| DELETE | `/api/orders/:id`        | Eliminar un pedido           |
 
 ### Entregas
 
-| Método | Ruta                  | Descripción            |
-| ------ | --------------------- | ---------------------- |
-| GET    | `/api/deliveries`     | Listar entregas        |
-| GET    | `/api/deliveries/:id` | Obtener una entrega    |
-| POST   | `/api/deliveries`     | Crear una entrega      |
-| PUT    | `/api/deliveries/:id` | Actualizar una entrega |
-| DELETE | `/api/deliveries/:id` | Eliminar una entrega   |
+| Método | Ruta                         | Descripción                  |
+| ------ | ---------------------------- | ---------------------------- |
+| GET    | `/api/deliveries`            | Listar entregas              |
+| GET    | `/api/deliveries/:id`        | Obtener una entrega          |
+| POST   | `/api/deliveries`            | Crear una entrega            |
+| POST   | `/api/deliveries/:id/proofs` | Subir comprobante de entrega |
+| PUT    | `/api/deliveries/:id`        | Actualizar una entrega       |
+| DELETE | `/api/deliveries/:id`        | Eliminar una entrega         |
 
 Las operaciones de creación y actualización deben respetar los campos definidos por los modelos y las relaciones entre las entidades.
+
+## Gestión de archivos
+
+La API permite adjuntar archivos asociados a usuarios, pedidos y entregas mediante endpoints que utilizan solicitudes `multipart/form-data`.
+
+### Endpoints disponibles
+
+| Método | Ruta                         | Descripción                          |
+| ------ | ---------------------------- | ------------------------------------ |
+| POST   | `/api/users/:uid/documents`  | Adjuntar documentación de un usuario |
+| POST   | `/api/users/:uid/licenses`   | Adjuntar licencia de un usuario      |
+| POST   | `/api/orders/:id/proofs`     | Adjuntar comprobante de un pedido    |
+| POST   | `/api/deliveries/:id/proofs` | Adjuntar comprobante de una entrega  |
+
+### Validaciones
+
+Las cargas de archivos contemplan validaciones relacionadas con:
+
+- La obligatoriedad del archivo.
+- Los tipos de archivos permitidos.
+- El tamaño máximo permitido de 5 MB.
+- La validación del tipo de documento cuando corresponde.
+
+Los archivos se procesan mediante middleware de carga y los errores se integran al sistema centralizado de manejo de errores de la API.
+
+Los endpoints se encuentran documentados y pueden probarse desde Swagger UI en `/api/docs`.
 
 # Manejo profesional de errores
 
@@ -262,6 +302,13 @@ La API utiliza códigos específicos para identificar los errores y facilitar su
 | `USER_ADMIN_CREATION_FORBIDDEN`        |         400 | No está permitida la creación de usuarios administradores. |
 | `USER_ADMIN_ROLE_ASSIGNMENT_FORBIDDEN` |         400 | No está permitida la asignación del rol administrador.     |
 | `USER_EMAIL_ALREADY_EXISTS`            |         409 | El correo electrónico ya está registrado.                  |
+| `FORBIDDEN`                            |         403 | Operación no autorizada.                                   |
+| `USER_ADMIN_ROLE_ASSIGNMENT_FORBIDDEN` |         400 | No está permitida la asignación del rol administrador.     |
+| `INVALID_FILE_TYPE`                    |         400 | Tipo de archivo no permitido.                              |
+| `FILE_TOO_LARGE`                       |         400 | Archivo que supera el tamaño máximo permitido de 5 MB.     |
+| `FILE_REQUIRED`                        |         400 | Archivo obligatorio no adjuntado.                          |
+| `UPLOAD_ERROR`                         |         400 | Error durante el procesamiento de la carga.                |
+| `INVALID_DOCUMENT_TYPE`                |         400 | Tipo de documento inválido.                                |
 
 ### Clasificación de errores
 
@@ -433,6 +480,8 @@ La carpeta `logs/` está incluida en `.gitignore`, por lo que los registros gene
 
 ShipNow utiliza Swagger y OpenAPI para documentar los endpoints y facilitar su consulta y prueba.
 
+Swagger permite realizar pruebas directamente sobre los endpoints documentados, incluyendo operaciones CRUD, generación de mocks, seed y carga de archivos, facilitando la validación del comportamiento de la API sin necesidad de utilizar herramientas externas.
+
 La documentación interactiva está disponible en:
 
 `http://localhost:8080/api/docs`
@@ -525,9 +574,11 @@ Cada prueba verifica el código de estado HTTP y la estructura de la respuesta, 
 
 En la última ejecución de la suite completa se obtuvo el siguiente resultado:
 
-**45 pruebas exitosas y 0 pruebas fallidas.**
+**67 pruebas exitosas y 0 pruebas fallidas.**
 
-Esto permite verificar de forma automatizada el funcionamiento de los principales módulos de la API.
+Las pruebas verifican el comportamiento de los principales módulos de la API, incluyendo usuarios, pedidos, entregas, mocking, logging, documentación Swagger y manejo de rutas inexistentes.
+
+La suite permite comprobar tanto los escenarios exitosos como las validaciones y respuestas ante distintos errores.
 
 ### Archivos excluidos de Git
 
